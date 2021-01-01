@@ -70,4 +70,10 @@ public class WebBot {
 			System.out.print("Timeout waiting for Page Load Request to complete");
 		}
 	}
+
+	public void closeDriver() {
+		// TODO Auto-generated method stub
+		this.driver.quit();
+		
+	}
 }

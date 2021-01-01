@@ -29,5 +29,6 @@ public class App
         	webBot.save(saveTo);
         }
         System.out.println("end");
+        webBot.closeDriver();
     }
 }
