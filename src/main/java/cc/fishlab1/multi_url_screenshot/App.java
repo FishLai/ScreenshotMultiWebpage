@@ -13,9 +13,21 @@ public class App
     {
 		System.setProperty("webdriver.chrome.driver", "src/assists/webdriver/chromedriver.exe");
         System.out.println( "Hello World!" );
-        String fDir = "C:\\Users\\Nestor.LAI\\Downloads\\test-multi-urls.xlsx";
+        String fDir = "src/assists/source/URLs.txt";
         HandleURLs handleURLs = new HandleURLs(fDir);
-        ArrayList<String> urls = handleURLs.doHandleXlsx();
+        ArrayList<String> urls = handleURLs.doRead();
+        WebBot webBot = new WebBot();
+        String saveTo, fn;
         
+        for(int i=0; i<urls.size();i++) {
+        	fn = "test" + String.valueOf(i) + ".jpg";
+        	saveTo = "src/assists/output/picture/" + fn;
+        	System.out.println("capture count : "+i );
+        	webBot.setUrl(urls.get(i));
+        	webBot.openWebpage();
+        	webBot.screenshot();
+        	webBot.save(saveTo);
+        }
+        System.out.println("end");
     }
 }

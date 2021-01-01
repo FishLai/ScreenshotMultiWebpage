@@ -2,9 +2,13 @@ package cc.fishlab1.multi_url_screenshot;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -13,18 +17,69 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class HandleURLs {
 	private File file;
-	private ArrayList<String> URLs;
+	private String extension;
+	
 	public HandleURLs(String fnDir) {
-		
 		this.file = new File(fnDir);
+		this.extension = jurdgeFileExtension(fnDir);
 	}
 	
-	public ArrayList<String> doHandleXlsx() throws IOException {
-		HandleXlsx excel = new HandleXlsx(this.file);
-		return excel.doRead();
+	public ArrayList<String> doRead() throws IOException {
+		File file = this.file;
+		ArrayList<String> URLs = new ArrayList<String>();
+		if(extension.equals("text")) {
+			HandleText handle = new HandleText(file);
+			URLs = handle.doRead();
+		}else if(extension.equals("xlsx")) {
+			HandleXlsx handle = new HandleXlsx(file);
+			URLs = handle.doRead();
+		}
+		
+		return URLs;
 	}
 	
 	
+	private String jurdgeFileExtension(String fnDir) {
+		Pattern pattern;
+		Matcher matcher;
+		boolean isMatch;
+		pattern = Pattern.compile("txt$", Pattern.CASE_INSENSITIVE);
+		matcher = pattern.matcher(fnDir);
+		isMatch = matcher.find();
+		if(isMatch) {
+			return "text";
+		}
+		
+		pattern = Pattern.compile("xlsx$", Pattern.CASE_INSENSITIVE);
+		matcher = pattern.matcher(fnDir);
+		isMatch = matcher.find();
+		if(isMatch) {
+			return "xlsx";
+		}
+		
+		return null;
+	}
+}
+
+class HandleText {
+	private File file;
+	
+	public HandleText(File file) {
+		this.file = file;
+	}
+	
+	public ArrayList<String> doRead() throws FileNotFoundException {
+		File file = this.file;
+		Scanner txt = new Scanner(file);
+		String url;
+		ArrayList<String> URLs = new ArrayList<String>();
+		while(txt.hasNextLine()) {
+			url = txt.nextLine();
+			URLs.add(url);
+		}
+		txt.close();
+		return URLs;
+	}
 }
 
 class HandleXlsx {
@@ -49,13 +104,10 @@ class HandleXlsx {
 				//System.out.print(cell.toString() +";");
 				urls.add(cell.toString());
 			}
-			
-			System.out.println();
 		}
 		
 		workbook.close();
 		fIS.close();
-		
 		return urls;
 	}
 	
